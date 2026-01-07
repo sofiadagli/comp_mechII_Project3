@@ -4,15 +4,15 @@ import numpy as np
 
 def beam_element_matrices(E, I, rho, A, Le):
     ke = (E*I/Le**3)*np.array([
-        [  12,    6*Le,   -12,    6*Le]
-        [6*Le, 4*Le**2, -6*Le, 2*Le**2]
-        [ -12,   -6*Le,    12,   -6*Le]
+        [  12,    6*Le,   -12,    6*Le],
+        [6*Le, 4*Le**2, -6*Le, 2*Le**2],
+        [ -12,   -6*Le,    12,   -6*Le],
         [6*Le, 2*Le**2, -6*Le, 4*Le**2]])
     
     me = (rho*A*Le/420)*np.array([
-        [   156,    22*Le,     54,   -13*Le]
-        [ 22*Le,  4*Le**2,  13*Le, -3*Le**2]
-        [    54,    13*Le,    156,   -22*Le]
+        [   156,    22*Le,     54,   -13*Le],
+        [ 22*Le,  4*Le**2,  13*Le, -3*Le**2],
+        [    54,    13*Le,    156,   -22*Le],
         [-13*Le, -3*Le**2, -22*Le,  4*Le**2]])
     
     return ke, me
@@ -36,6 +36,16 @@ def assemble_global_matrices(n_elem, E, I, rho, A, L):
                 M[idx[i], idx[j]] += me[i,j]
                 
     return K, M
+
+def apply_boundary_conditions(K, M, f, fixed_dofs):
+    free = np.setdiff1d(np.arange(len(f)), fixed_dofs)
+    return (
+        K[np.ix_(free,free)],
+        M[np.ix_(free,free)],
+        f[free],
+        free
+        )
+
 
                 
         
