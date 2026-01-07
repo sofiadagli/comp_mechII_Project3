@@ -2,6 +2,8 @@
 
 import numpy as np
 
+import matplotlib.pyplot as plt
+
 def newmark(M, K, f_func, u0, v0, dt, t_end, alpha=0.25, beta=0.5):
     n = len(u0)
     n_steps = int(t_end/dt)
@@ -38,7 +40,50 @@ def newmark(M, K, f_func, u0, v0, dt, t_end, alpha=0.25, beta=0.5):
         
     return t, u, v, a
 
-        
+def freq_estimation(t, uhl, min_height=1e-8, min_distance=0.01, n_periods=5):
+       
+    peaks_all = np.where(
+        (uhl[1:-1]>uhl[:-2]) &
+        (uhl[1:-1]>uhl[2:]) &
+        (uhl[1:-1] > min_height)
+        )[0] + 1
+     
+    if len(peaks_all) <2:
+        raise ValueError("Not enough positive peaks")
+    
+    #filter close peaks
+    peak_times = []
+    peak_values = []
+    last_peak_time = -np.inf
+    for idx in peaks_all:
+        t_peak = t[idx]
+        if t_peak - last_peak_time >= min_distance:
+            peak_times.append(t_peak)
+            peak_values.append(uhl[idx])
+            last_peak_time = t_peak
+            
+    peak_times = np.array(peak_times)
+    peak_values = np.array(peak_values)
+    
+    periods = np.diff(peak_times)
+    T_avg = np.mean(periods)
+    
+    omega_est = 2*np.pi/T_avg
+    
+    plt.figure(figsize =(9,4))
+    plt.plot(t,uhl)
+    plt.plot(peak_times, peak_values, "ro")
+    plt.xlabel("t")
+    plt.ylabel("w(L)")
+    plt.show()
+    
+    return omega_est
+
+    
+    
+    
+    
+    
     
     
     
