@@ -4,6 +4,7 @@ import numpy as np
 from assembly import assemble_global_matrices, apply_boundary_conditions
 from static_solver import tip_load_vector, static_solve, analytical_solution
 from newmark import newmark, freq_estimation
+from post_processing import animate_beam
 
 # Material & Geometry
 E = 210e9
@@ -54,18 +55,35 @@ omega_ana = (1.875**2) * np.sqrt(E*I/(rho*A*L**4))
 print(f"ω1 FEM: {omega_1:.3f}")
 print(f"ω1 ANA: {omega_ana:.3f}")
 
-print("stop")
+#--------------------------------------------------------------------
+# PART C: Forced Vibration
+#--------------------------------------------------------------------
 
+P0 = 1000.0
+Omega = 0.95*omega_1
 
+def harmonic_force(t):
+    f = np.zeros_like(u0)
+    f[-2] = P0 * np.sin(Omega*t)
+    
+    return f
 
+u0 = np.zeros_like(u0)
+v0 = np.zeros_like(u0)
 
+t, uh, vh, ah = newmark(M_r, K_r, harmonic_force, u0, v0, dt, t_end)
 
-
-
-
-
-
-
+animate_beam(
+    uh,
+    free_dofs=free,
+    n_elem=n_elem,
+    L=L,
+    time=t,
+    scale=55,
+    filename="semfebeam.gif",
+    fps0=30,
+    max_frames=150,
+    show=True)
 
 
 
