@@ -6,13 +6,14 @@ import matplotlib.pyplot as plt
 
 def newmark(M, K, f_func, u0, v0, dt, t_end, alpha=0.25, beta=0.5):
     n = len(u0)
-    n_steps = int(t_end/dt)
+    n_steps = int(t_end/dt) + 1
+    
     t = np.linspace(0, t_end, n_steps)
     
     #init
-    u = np.zeros((n_steps,n))
-    v = np.zeros((n_steps,n))
-    a = np.zeros((n_steps,n))
+    u = np.zeros((n_steps, n))
+    v = np.zeros((n_steps, n))
+    a = np.zeros((n_steps, n))
     
     u[0] = u0
     v[0] = v0
